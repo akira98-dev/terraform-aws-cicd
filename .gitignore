@@ -1,0 +1,8 @@
+# Terraformの一時ファイル・ローカル状態
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# 機密情報
+*.tfvars
