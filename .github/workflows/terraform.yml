@@ -1,0 +1,42 @@
+name: "Terraform CI/CD Pipeline"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write   # OIDC認証（IDトークンの発行）に必須！
+  contents: read    # リポジトリのコード読み取りに必要
+
+jobs:
+  terraform:
+    name: "Terraform Plan"
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. リポジトリのコードをLinux環境にダウンロード
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. AWSにOIDCを使って仮変身（Phase 3で設定したVariablesを利用）
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # 3. Linux環境にTerraformコマンドをインストール
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 4. Terraformの初期化
+      - name: Terraform Init
+        run: terraform init
+
+      # 5. 安全確認（変更計画のプレビュー）
+      - name: Terraform Plan
+        run: terraform plan
