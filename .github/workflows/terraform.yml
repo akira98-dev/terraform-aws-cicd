@@ -28,6 +28,7 @@ jobs:
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
+          audience: sts.amazonaws.com
 
       # 3. Linux環境にTerraformコマンドをインストール
       - name: Setup Terraform
