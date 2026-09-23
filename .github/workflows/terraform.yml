@@ -9,8 +9,8 @@ on:
       - main
 
 permissions:
-  id-token: write   # OIDC認証（IDトークンの発行）に必須！
-  contents: read    # リポジトリのコード読み取りに必要
+  id-token: write
+  contents: read
 
 jobs:
   terraform:
@@ -18,27 +18,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. リポジトリのコードをLinux環境にダウンロード
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. AWSにOIDCを使って仮変身
+      # ★ここで実際の token(sub) を取得してログに表示するにゃ！
+      - name: Print OIDC Token Payload
+        run: |
+          TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r '.value')
+          echo "=== 実際のsubの値はこちらだにゃ ==="
+          jq -R 'split(".") | .[1] | @base64d | fromjson' <<< "$TOKEN"
+          echo "=================================="
+
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
           audience: sts.amazonaws.com
-          role-skip-session-tagging: true  # 余計なセッションタグの送信を無効化する設定だにゃ
+          role-skip-session-tagging: true
 
-      # 3. Linux環境にTerraformコマンドをインストール
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      # 4. Terraformの初期化
       - name: Terraform Init
         run: terraform init
 
-      # 5. 安全確認（変更計画のプレビュー）
       - name: Terraform Plan
         run: terraform plan
