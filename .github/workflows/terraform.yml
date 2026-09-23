@@ -22,11 +22,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         
-      # デバッグ用：値が正しく読み込めているか出力テスト（安全のため文字数をカウント）
+      # デバッグ用：値が正しく読み込めているか出力テスト
       - name: Debug Variable Check
         run: |
           echo "AWS Region is: ${{ vars.AWS_REGION }}"
-          echo "Role ARN length is: ${{ strLen(vars.AWS_ROLE_ARN) }}"
+          echo "Role ARN is: ${{ vars.AWS_ROLE_ARN }}"
 
       # 2. AWSにOIDCを使って仮変身（Phase 3で設定したVariablesを利用）
       - name: Configure AWS Credentials via OIDC
