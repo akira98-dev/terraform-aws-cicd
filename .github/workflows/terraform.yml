@@ -21,14 +21,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # ★ここで実際の token(sub) を取得してログに表示するにゃ！
-      - name: Print OIDC Token Payload
-        run: |
-          TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r '.value')
-          echo "=== 実際のsubの値はこちらだにゃ ==="
-          jq -R 'split(".") | .[1] | @base64d | fromjson' <<< "$TOKEN"
-          echo "=================================="
-
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
