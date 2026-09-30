@@ -64,6 +64,6 @@ jobs:
         run: terraform plan -no-color
 
       # 8. 【Phase 6の目玉】mainブランチへのマージ（push）時のみ terraform apply を実行！
-      - name: Terraform Apply
+      - name: Terraform Destroy
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve
+        run: terraform destroy -auto-approve
