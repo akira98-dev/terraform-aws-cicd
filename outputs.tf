@@ -7,7 +7,7 @@ output "vpc_id" {
 # パブリックサブネット（1a / 1c）のIDを出力
 output "public_subnet_ids" {
   description = "IDs of public subnets"
-  value       = [
+  value = [
     aws_subnet.public_subnet_1a.id
   ]
 }

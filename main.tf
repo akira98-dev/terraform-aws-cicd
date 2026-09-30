@@ -70,50 +70,50 @@ resource "aws_nat_gateway" "main" {
 }
 resource "aws_s3_bucket" "main" {
   bucket = "${var.env_prefix}-app-logs-20260920"
-  
+
   tags = {
     Name = "${var.env_prefix}-app-logs-20260920"
   }
 }
 
 resource "aws_security_group" "web_sg" {
-    name = "${var.env_prefix}-web-sg"
-    description = "Allow http inbound traffic"
-    vpc_id = aws_vpc.main.id # どのVPCに作るか
+  name        = "${var.env_prefix}-web-sg"
+  description = "Allow http inbound traffic"
+  vpc_id      = aws_vpc.main.id # どのVPCに作るか
 
-    # インバウンドルール(入ってくる通信):HTTP(ポート80)
-    ingress {
-        description = "Allow HTTP from anywhere"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-            }
-    # アウトバウンドルール(出ていく通信)すべて許可
-    egress {
-        from_port = 0
-        to_port =  0
-        protocol = "-1" # "-1" は「すべてのプロトコル」という意味
-        cidr_blocks = ["0.0.0.0/0"]
-    }
+  # インバウンドルール(入ってくる通信):HTTP(ポート80)
+  ingress {
+    description = "Allow HTTP from anywhere"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  # アウトバウンドルール(出ていく通信)すべて許可
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1" # "-1" は「すべてのプロトコル」という意味
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-    tags = {
-        Name = "${var.env_prefix}-web-sg"
-    }
+  tags = {
+    Name = "${var.env_prefix}-web-sg"
+  }
 }
 resource "aws_instance" "web_server" {
-    # OSのイメージIDを指定
-    ami = "ami-0d52744d6551d851e" # ※時期によって変わるけど演習用ならこれでOKだにゃ
-    # サーバーのスペック（小規模・演習用の定番）
-    instance_type = "t3.micro"
-    # 配置するサブネットのID
-    subnet_id = aws_subnet.public_subnet_1a.id
-    # 装着するセキュリティグループのID
-    vpc_security_group_ids = [aws_security_group.web_sg.id]
-    # プライベートに置くためパブリックIP付与は不要
-    associate_public_ip_address = true
-    # 起動時に自動実行するスクリプト（Apacheインストール＆Web起動用）※オプション
-        user_data = <<-EOF
+  # OSのイメージIDを指定
+  ami = "ami-0d52744d6551d851e" # ※時期によって変わるけど演習用ならこれでOKだにゃ
+  # サーバーのスペック（小規模・演習用の定番）
+  instance_type = "t3.micro"
+  # 配置するサブネットのID
+  subnet_id = aws_subnet.public_subnet_1a.id
+  # 装着するセキュリティグループのID
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  # プライベートに置くためパブリックIP付与は不要
+  associate_public_ip_address = true
+  # 起動時に自動実行するスクリプト（Apacheインストール＆Web起動用）※オプション
+  user_data = <<-EOF
               #!/bin/bash
               apt update -y
               apt install -y apache2
@@ -121,8 +121,8 @@ resource "aws_instance" "web_server" {
               systemctl enable apache2
               echo "<h1>Hello from Terraform!</h1>" > /var/www/html/index.html
               EOF
-    # タグ
-    tags = {
-      Name = "${var.env_prefix}-web-server"
-    }
+  # タグ
+  tags = {
+    Name = "${var.env_prefix}-web-server"
+  }
 }
