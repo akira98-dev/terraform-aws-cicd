@@ -6,3 +6,5 @@
 
 # 機密情報
 *.tfvars
+*.exe
+*.outputs.tf
