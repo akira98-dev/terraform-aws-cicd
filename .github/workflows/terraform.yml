@@ -8,11 +8,11 @@ on:
     branches:
       - main
 
-# OIDC 認証で ID トークンを取得するために必須の設定
+# OIDC 認証とリポジトリへの Push 権限を両立する設定
 permissions:
   id-token: write
-  contents: read
-  pull-requests: write  # PRにplan結果をコメント書き込みしたい場合に必要
+  contents: write    # 👈 ここを write に変更したにゃ！
+  pull-requests: write
 
 jobs:
   terraform:
@@ -24,7 +24,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-    # OIDC トークンの sub の値をログに直接出力して確認するステップ
+      # OIDC トークンの sub の値をログに直接出力して確認するステップ
       - name: Debug OIDC Token Sub
         uses: actions/github-script@v7
         with:
@@ -50,7 +50,7 @@ jobs:
       - name: Terraform Format
         run: terraform fmt -check
 
-      # 5. 初期化（S3 バックエンド等の接続）
+      # 5. 初期化
       - name: Terraform Init
         run: terraform init
 
@@ -58,12 +58,12 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      # 7. 変更内容の確認（PR時およびpush時に実行）
+      # 7. 変更内容の確認
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color
 
-      # 8. 【Phase 6の目玉】mainブランチへのマージ（push）時のみ terraform apply を実行！
-      - name: Terraform destroy
+      # 8. mainブランチへのマージ（push）時のみ terraform apply / destroy を実行！
+      - name: Terraform apply or Destroy
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform destroy -auto-approve
+        run: terraform apply -auto-approve
