@@ -69,10 +69,10 @@ resource "aws_nat_gateway" "main" {
 
 }
 resource "aws_s3_bucket" "main" {
-  bucket = "${var.env_prefix}-app-logs-20260920"
+  bucket = "${var.env_prefix}-app-logs-20261006"
 
   tags = {
-    Name = "${var.env_prefix}-app-logs-20260920"
+    Name = "${var.env_prefix}-app-logs-20261006"
   }
 }
 
