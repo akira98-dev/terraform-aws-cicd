@@ -66,4 +66,4 @@ jobs:
       # 8. mainブランチへのマージ（push）時のみ terraform apply / destroy を実行！
       - name: Terraform apply or Destroy
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve
+        run: terraform destroy -auto-approve
