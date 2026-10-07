@@ -19,12 +19,17 @@ jobs:
     name: "Terraform Automation"
     runs-on: ubuntu-latest
 
+    # 全ての run コマンドを 02_app_infra ディレクトリ内で実行する設定
+    defaults:
+      run:
+        working-directory: ./02_app_infra
+
     steps:
       # 1. リポジトリのコードをチェックアウト
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # OIDC トークンの sub の値をログに直接出力して確認するステップ
+      # OIDC トークンの sub の値をログに出力して確認（必要に応じて残す）
       - name: Debug OIDC Token Sub
         uses: actions/github-script@v7
         with:
@@ -50,7 +55,7 @@ jobs:
       - name: Terraform Format
         run: terraform fmt -check
 
-      # 5. 初期化
+      # 5. 初期化（02_app_infra の中で実行される）
       - name: Terraform Init
         run: terraform init
 
@@ -63,7 +68,7 @@ jobs:
         id: plan
         run: terraform plan -no-color
 
-      # 8. mainブランチへのマージ（push）時のみ terraform apply / destroy を実行！
-      - name: Terraform apply or Destroy
+      # 8. mainブランチへのマージ（push）時のみ terraform apply を実行
+      - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform destroy -auto-approve
+        run: terraform apply -auto-approve
