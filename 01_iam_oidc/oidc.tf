@@ -24,8 +24,8 @@ resource "aws_iam_role" "github_actions" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            # GitHubリポジトリ（akira98-dev/terraform-aws-cicd）からのアクセスのみ許可
-            "token.actions.githubusercontent.com:sub" = "repo:akira98-dev/terraform-aws-cicd:*"
+            # 実際のID付き表記（@330691509 や @1377957341）に対応したパターンマッチ
+            "token.actions.githubusercontent.com:sub" = "repo:akira98-dev@*/terraform-aws-cicd@*:*"
           }
         }
       }
